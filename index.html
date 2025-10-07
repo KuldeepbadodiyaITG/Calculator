@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        }
+
+        .calculator {
+            border-radius: 12px;
+            width: 320px;
+            padding: 20px;
+            border: 1px solid;
+            box-shadow: #f3f4f6;
+            animation: sideIn .6s;
+        }
+
+        @keyframes sideIn {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(0%);
+            }
+        }
+
+        .display {
+            background-color: #444;
+            color: white;
+            font-size: 2rem;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: right;
+            margin-bottom: 20px;
+            min-height: 50px;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            font-size: 1.5rem;
+            padding: 20px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: white;
+            background-color: #333;
+        }
+
+        button:hover {
+            background-color: white;
+            color: black;
+        }
+
+        button.zero {
+            grid-column: span 2;
+        }
+
+        .heading {
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        button#cancel {
+            background: brown;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="mainn">
+
+        <div class="calculator">
+            <!-- <h1 class="heading">Calculator</h1> -->
+            <div class="display" id="display"></div>
+            <div class="buttons">
+                <button id="cancel" class="operator">C</button>
+                <button id="del" class="operator">D</button>
+                <button onclick="getValue(this)" class="operator">%</button>
+                <button onclick="getValue(this)" class="operator">/</button>
+
+                <button onclick="getValue(this)" class="number">7</button>
+                <button onclick="getValue(this)" class="number">8</button>
+                <button onclick="getValue(this)" class="number">9</button>
+                <button onclick="getValue(this)" class="operator">*</button>
+
+                <button onclick="getValue(this)" class="number">4</button>
+                <button onclick="getValue(this)" class="number">5</button>
+                <button onclick="getValue(this)" class="number">6</button>
+                <button onclick="getValue(this)" class="operator">-</button>
+
+                <button onclick="getValue(this)" class="number">1</button>
+                <button onclick="getValue(this)" class="number">2</button>
+                <button onclick="getValue(this)" class="number">3</button>
+                <button onclick="getValue(this)" class="operator">+</button>
+
+                <button onclick="getValue(this)" class="number zero">0</button>
+                <button onclick="getValue(this)" class="number">.</button>
+                <button onclick="" id="answer" class="operator">=</button>
+            </div>
+        </div>
+    </section>
+    <script>
+
+        let buttons = document.querySelector(".buttons")
+        let operator = document.querySelector(".operator")
+        let number = document.querySelector(".number")
+        let display = document.querySelector(".display")
+        let cancel = document.getElementById("cancel")
+        let equal = document.getElementById('answer')
+        let del = document.getElementById("del")
+
+
+        function getValue(val) {
+            let display = document.getElementById('display');
+            display.innerText += val.innerText;
+        };
+
+
+        cancel.addEventListener("click", () => {
+            display.innerHTML = ""
+        })
+
+        del.addEventListener("click", () => {
+            display.innerText = display.innerText.slice(0, -1);
+        })
+
+        equal.addEventListener('click', () => {
+            let exp = display.innerHTML
+            function getResult(exp) {
+                function isNumber(exp) {
+                    let n = Number(exp)
+                    if (Number.isNaN(n) && exp != ".") return false
+                    return true;
+                }
+                for (let i = 1; i < exp.length; i++) {
+                    if (!isNumber(exp[i]) && !isNumber(exp[i - 1])) {
+                        return "undefined"
+                    }
+                }
+                if (!isNumber(exp[exp.length - 1])) {
+                    return "undefined"
+                }
+                const operators = [], operands = []
+                let i = 0;
+
+                while (i < exp.length) {
+                    let v = exp[i]
+                    let n = Number(v);
+                    if (i == 0 && !isNumber(v)) {
+                        let currNumber = exp[i];
+                        i++;
+                        while (isNumber(exp[i])) {
+                            currNumber += exp[i]
+                            i++;
+                        }
+                        operands.push(Number(currNumber))
+                        // i+=currNumber.length;
+                        continue
+                    }
+                    if (!isNumber(exp[i])) {
+                        operators.push(exp[i]);
+                        i++;
+                    }
+                    else {
+                        let currNumber = "";
+                        while (isNumber(exp[i])) {
+                            currNumber += exp[i]
+                            i++;
+                        }
+                        operands.push(Number(currNumber))
+                    }
+                }
+                let res = operands[0], index = 0;
+                console.log(operands, operators)
+                for (let i = 1; i < operands.length; i++) {
+                    if (operators[index] == "*") {
+                        res = res * operands[i]
+                    }
+
+                    if (operators[index] == "+") {
+                        res = res + operands[i]
+                    }
+
+                    if (operators[index] == "-") {
+                        res = res - operands[i]
+                    }
+
+                    if (operators[index] == "%") {
+                        res = res % operands[i]
+                    }
+
+                    if (operators[index] == "/") {
+                        res = res / operands[i]
+                    }
+
+                    index++;
+                }
+                if (!isNumber(res)) {
+                    return "undefined"
+                }
+                return res;
+            }
+            display.innerHTML = getResult(exp)
+        })
+    </script>
+</body>
+
+</html>
